@@ -16,18 +16,27 @@ def program(t):
     return x
 
 
-def main():
-    DATA_MASK = 0b11111111111111
-    for t in range(FRAMERATE):
-        data = program(t) & DATA_MASK
-        record(data)
+def main(func):
+    func = mask(func)
+    clock = [t for t in range(FRAMERATE)]
+    data = map(func, clock)
+    record(data)
     print("Have a nice day! :3")
 
 
+def mask(program): # This could be a decorator
+    BIT_MASK = 0b11111111111111
+
+    def func(t):
+        return program(t) & BIT_MASK
+    return func
+
+
 def record(data):
-    print(data)
+    for integer in data:
+        print(integer)
     pass
 
 
 if __name__ == "__main__":
-    main()
+    main(program)
