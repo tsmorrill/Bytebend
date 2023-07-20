@@ -3,7 +3,7 @@ from midiutil import MIDIFile
 
 FILENAME = "shiftcc"
 MIDI_CC = 1
-MIDI_CHANNEL = 1
+MIDI_CHANNEL = 0
 
 FRAME_TICKS = 40 # 960 ticks = 1 quarter note
 DURATION = 96 # in frames
