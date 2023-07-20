@@ -5,8 +5,8 @@ FILENAME = "shiftcc"
 MIDI_CC = 1
 MIDI_CHANNEL = 1
 
-FRAMERATE = 24 # frames per second
-DURATION = 32 # in frames
+FRAME_TICKS = 40 # 960 ticks = 1 quarter note
+DURATION = 96 # in frames
 
 x = randrange(1, 2 << 7)
 
@@ -37,10 +37,11 @@ def end():
 
 
 def process(data):
+    # avoid interpolation
     BIT_MASK = 0b1111111
-    frame_length = 1 / FRAMERATE
     midifile = init_midifile()
-    frame_start = 0.0
+    frame_start = 0
+    frame_end = FRAME_TICKS - 1
 
     for n in data:
         n &= BIT_MASK
@@ -51,12 +52,24 @@ def process(data):
             controller_number=MIDI_CC,
             parameter=n
         )
-        frame_start += frame_length
+        midifile.addControllerEvent(
+            track=0,
+            channel=MIDI_CHANNEL,
+            time=frame_end,
+            controller_number=MIDI_CC,
+            parameter=n
+        )
+
+        frame_start += FRAME_TICKS
+        frame_end += FRAME_TICKS
     return(midifile)
 
-
 def init_midifile():
-    file = MIDIFile(1)
+    file = MIDIFile(
+        numTracks=1,
+        ticks_per_quarternote=960,
+        eventtime_is_ticks=True
+    )
     file.addTempo(track=0, time=0.0, tempo=60) # 60 BPM
     file.addTrackName(track=0, time=0.0, trackName=FILENAME)
     # MIDIUtil documentation is incorrect
