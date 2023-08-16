@@ -33,6 +33,7 @@ ARRAY_LENGTH = 4
 lfsr = 1
 taps = 0b0011
 
+# this should return a generator with an internal time counter
 def advance(time):
     global taps
     global lfsr
