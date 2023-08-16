@@ -27,38 +27,41 @@ FILENAME = "bytebend-lfsr"
 MIDI_CHANNEL = 0
 
 FRAME_TICKS = 40 # 960 ticks = 1 quarter note
-DURATION = 96 * 16 # in frames
-
-ARRAY_LENGTH = 4
-lfsr = 1
-taps = 0b0011
-
-# this should return a generator with an internal time counter
-def advance(time):
-    global taps
-    global lfsr
-    taps ^= (time >> 1) % 16
-    x = lfsr ^ taps
-    x = x ^ (x >> 1) ^ (x >> 2)
-    x &= 1
-    lfsr >>= 1
-    lfsr += x << (ARRAY_LENGTH - 1)
 
 
-def pitch(time):
-    global lfsr
-    offset = (time >> 4) % 4
-    index = (lfsr + offset) % len(GAMUT)
-    pitch = GAMUT[index]
-    advance(time)
+def dirty_lfsr(init:int=0b1001):
+    count = 0
+    register = init
+    while True:
+        yield register + ((count >> 2) % 4)
+        count = (count + 1) & 0b10000
+        x = register ^ (register >> 1)
+        x ^= count >> 4
+        x &= 1
+        register >>= 1
+        register += (x << 4)
 
-    return pitch
+
+def pitch(index:int):
+    match index:
+        case None:
+            output = None
+        case int:
+            index &= 0b111
+            output = GAMUT[index]
+    return output
 
 
 def main():
-    print(f"LFSR initialized to {lfsr:>04b}")
-    print(list(map(pitch, range(MAX_NOTES))))
-
+    rhythm1 = (1, 0, 1, 1, 0, 1, 1, 0)
+    rhythm2 = (1, 1, 1, 1, 0, 1, 0, 1)
+    phrase = 3*rhythm1 + rhythm2
+    song = 16 * phrase
+    trigs = (bool(n) for n in song)
+    rng = dirty_lfsr()
+    random = (next(rng) if trig else None for trig in trigs)
+    notes = tuple(map(pitch, random))
+    print(notes)
 
 if __name__ == "__main__":
     main()
