@@ -21,25 +21,17 @@ C6 = 84
 PHRYGIAN = (D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5)
 GAMUT = PHRYGIAN
 
-MAX_NOTES = 32 # 128
-
-FILENAME = "bytebend-lfsr"
-MIDI_CHANNEL = 0
-
-FRAME_TICKS = 40 # 960 ticks = 1 quarter note
-
-
-def dirty_lfsr(init:int=0b1001):
+def dirty_lfsr(init:int=0b001):
     count = 0
     register = init
     while True:
-        yield register + ((count >> 2) % 4)
-        count = (count + 1) & 0b10000
-        x = register ^ (register >> 1)
-        x ^= count >> 4
+        yield register + ((count >> 6) & 3)
+        count = count + 1
+        x = register ^ (register >> 2)
+        # x ^= count >> 2
         x &= 1
         register >>= 1
-        register += (x << 4)
+        register += (x << 2)
 
 
 def pitch(index:int):
@@ -47,7 +39,6 @@ def pitch(index:int):
         case None:
             output = None
         case int:
-            index &= 0b111
             output = GAMUT[index]
     return output
 
@@ -61,7 +52,19 @@ def main():
     rng = dirty_lfsr()
     random = (next(rng) if trig else None for trig in trigs)
     notes = tuple(map(pitch, random))
-    print(notes)
+    file = MIDIFile()
+    file.addTrackName(track=0, time=0.0, trackName="dirty lfsr")
+    for pos, note in enumerate(notes):
+        if type(note) == int:
+            file.addNote(track=0,
+                         channel=0,
+                         pitch=note,
+                         time=pos*(1/2),
+                         duration=1/2,
+                         volume=127)
+    with open("dirty_lfsr.mid", "wb") as output:
+        file.writeFile(output)
+        print(f"Created file 'dirty_lfsr.mid'.")
 
 if __name__ == "__main__":
     main()
