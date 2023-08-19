@@ -1,7 +1,7 @@
 from functools import reduce
 from random import choice
 
-VERSION = '0.1a'
+VERSION = '0.1b'
 
 # my neighbors are always listening to really loud drum and bass
 # whether they like it or not!
@@ -25,7 +25,6 @@ def p_seq(seq:tuple, *, variance:int=None, alphabet:tuple=[0, 1]):
     if variance == None:
         variance = width >> 1
     p_set = set(p_indices(width)[:width - variance - 1:-1])
-    print(p_set)
     perturbation = (choice(alphabet) if i in p_set else val
                     for i, val in enumerate(seq))
     return(tuple(perturbation))
@@ -52,9 +51,11 @@ def tourney_choice(options:tuple):
 
 def main():
     print("Welcome to ME NEIGHBOURS, the Jocko Homomorphism beat nudger.")
+    print(f"                                                        v{VERSION}")
     print("")
-    print(f"v{VERSION} - Please enter  acomplete, single bar of 4/4 time.")
-    print("Any power-of-two division will do: quarters, 32nds, go nuts.")
+    print(f"Please enter  a single, complete bar of 4/4 time.")
+    print("Any power-of-two division will do: 8ths, 32nds, go nuts.")
+    print("Finer divisions work better.")
     print("")
     command = input("Enter your rhythm using 1's and 0's separated by spaces.\n")
     seq = tuple(int(val) for val in command.split())
