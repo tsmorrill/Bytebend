@@ -1,7 +1,8 @@
 from functools import reduce
 from random import choice
 
-VERSION = '0.1b'
+VERSION = '0.1c'
+DESCRIPTION = 'Coming soon: scale-degrees mode!'
 
 # my neighbors are always listening to really loud drum and bass
 # whether they like it or not!
@@ -19,8 +20,8 @@ def p_indices(width:int):
 
 
 def p_seq(seq:tuple, *, variance:int=None, alphabet:tuple=[0, 1]):
-    """Return a tuple that is equal to seq with randomized perturbations
-    occuring at indices given by last variance number of values in p_indices"""
+    '''Return a tuple that is equal to seq with randomized perturbations
+    occuring at indices given by last variance number of values in p_indices'''
     width = len(seq)
     if variance == None:
         variance = width >> 1
@@ -30,40 +31,100 @@ def p_seq(seq:tuple, *, variance:int=None, alphabet:tuple=[0, 1]):
     return(tuple(perturbation))
     
 
+def welcome():
+    noun = 'beat'
+    action = 'nudger'
+    print(f'Welcome to ME NEIGHBOURS, the Jocko Homomorphism {noun} {action}.')
+
+
+def version():
+    print('')
+    print(f'v{VERSION}')
+    print(DESCRIPTION)
+    print('')
+
+
+def oops():
+    print('Come again?')
+    print('')
+
+
+def pick(options:tuple, msg=''):
+    if msg != '':
+        print(msg)
+    verbose = (f'    {i}: {opt}' for i, opt in enumerate(options))
+    for line in verbose:
+        print(line)
+    selection = None
+    while selection is None:
+        try:
+            i = int(input())
+            selection = options[i]
+            print('')
+            print(f'{i}: {selection}')
+        except:
+            oops()
+    print('')
+    return selection
+
+
+def set_mode():
+    options = ('rhythm', 'scale-degrees')
+    return pick(options, 'Select mode:')
+
+
+def help_text(mode:str):
+    if mode == 'scale-degrees':
+        print('Scale degrees mode?')
+        print('Sure thing. Your scale has two degrees, "hit" and "rest".')
+        print('See you in v0.2! :P')
+        print('')
+
+    print(f'Please enter a single, complete bar of 4/4 time.')
+    print('Any power-of-two division will do: 8ths, 32nds, go nuts.')
+    print('Finer divisions work better.')
+    print('')
+
+
+
+def prompt(mode:str):
+    command = input("Enter your rhythm using 1's and 0's separated by spaces.\n")
+    seq = tuple(int(val) for val in command.split())
+    print('')
+    bar = b_string(seq)
+    print(f"That's {bar}.")
+    print('')
+    options = tuple(p_seq(seq) for _ in range(4))
+    bars = tuple(b_string(opt) for opt in options)
+    return bars
+
+
+def b_string(bar:tuple):
+    notes = ' '.join((str(val) for val in bar))
+    return f'| {notes} |'
+
+
 def compare(x, y):
-    print("")
-    print("Which do you prefer?")
-    print(f"1: {x}")
-    print(f"2: {y}")
-    print("")
-    output = None
-    while output is None:
-        match input("Type 1 or 2: "):
-            case '1':
-                output = x
-            case '2':
-                output = y
-    return output
+    return pick((x, y), 'Which sounds better to you?')
+
 
 def tourney_choice(options:tuple):
     return reduce(compare, options)
 
 
+def report(winner):
+    print(f'So go try {winner}!')
+
+
 def main():
-    print("Welcome to ME NEIGHBOURS, the Jocko Homomorphism beat nudger.")
-    print(f"                                                        v{VERSION}")
-    print("")
-    print(f"Please enter  a single, complete bar of 4/4 time.")
-    print("Any power-of-two division will do: 8ths, 32nds, go nuts.")
-    print("Finer divisions work better.")
-    print("")
-    command = input("Enter your rhythm using 1's and 0's separated by spaces.\n")
-    seq = tuple(int(val) for val in command.split())
-    options = tuple(p_seq(seq) for _ in range(4))
+    welcome()
+    version()
+    mode = set_mode()
+    help_text(mode)
+    options = prompt(mode)
     winner = tourney_choice(options)
-    print("")
-    print(f"Maybe {winner} will sound nice.")
+    report(winner)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
