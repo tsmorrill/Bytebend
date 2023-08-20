@@ -1,7 +1,7 @@
 from functools import reduce
 from random import choice
 
-VERSION = '0.1c'
+VERSION = '0.1d'
 DESCRIPTION = 'Coming soon: scale-degrees mode!'
 
 # my neighbors are always listening to really loud drum and bass
@@ -114,17 +114,19 @@ def tourney_choice(options:tuple):
 
 def report(winner):
     print(f'So go try {winner}!')
+    print('')
 
+
+def ciao():
+    print('Ciao!')
 
 def main():
     welcome()
     version()
     mode = set_mode()
     help_text(mode)
-    options = prompt(mode)
-    winner = tourney_choice(options)
-    report(winner)
-
+    report(tourney_choice(prompt(mode)))
+    ciao()
 
 if __name__ == '__main__':
     main()
