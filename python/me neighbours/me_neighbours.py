@@ -19,9 +19,9 @@ def p_indices(width:int):
     return tuple(p_order)
 
 
-def p_seq(seq:tuple, *, variance:int=None, alphabet:tuple=[0, 1]):
+def p_seq(seq:tuple, *, variance:int=None, alphabet:tuple=(0, 1)):
     '''Return a tuple that is equal to seq with randomized perturbations
-    occuring at indices given by last variance number of values in p_indices'''
+    occurring at indices given by last variance number of values in p_indices'''
     width = len(seq)
     if variance == None:
         variance = width >> 1
@@ -29,7 +29,7 @@ def p_seq(seq:tuple, *, variance:int=None, alphabet:tuple=[0, 1]):
     perturbation = (choice(alphabet) if i in p_set else val
                     for i, val in enumerate(seq))
     return(tuple(perturbation))
-    
+
 
 def welcome():
     noun = 'beat'
@@ -120,6 +120,7 @@ def report(winner):
 def ciao():
     print('Ciao!')
 
+
 def main():
     welcome()
     version()
@@ -127,6 +128,7 @@ def main():
     help_text(mode)
     report(tourney_choice(prompt(mode)))
     ciao()
+
 
 if __name__ == '__main__':
     main()
