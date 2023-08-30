@@ -8,6 +8,16 @@ DESCRIPTION = 'Coming soon: scale-degrees mode!'
 # whether they like it or not!
 #                                    @happyharryarbuckle, TikTok
 
+def compose(*funcs):
+    if funcs == ():
+        chain = lambda x: x
+    else:
+        head, *tail = funcs
+        chain_t = compose(*tail)
+        chain = lambda x: head(chain_t(x))
+    return lambda x: chain(x)
+
+
 def reverse(n:int, log_width:int):
     temp = '{:0{w}b}'.format(n, w=log_width)
     return int(temp[::-1], 2)
@@ -117,6 +127,8 @@ def report(winner):
     print('')
 
 
+action = compose(report, tourney_choice, prompt)
+
 def ciao():
     print('Ciao!')
 
@@ -126,7 +138,7 @@ def main():
     version()
     mode = set_mode()
     help_text(mode)
-    report(tourney_choice(prompt(mode)))
+    action(mode)
     ciao()
 
 
